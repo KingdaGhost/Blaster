@@ -17,6 +17,6 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
             bUseSeamlessTravel = true;
             World->ServerTravel(FString("/Game/Assets/Maps/BlasterArena?listen"));
         }
-    }
+    }    
 }
 

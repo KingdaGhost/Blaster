@@ -32,7 +32,7 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
     case ENetRole::ROLE_None:
         Role = FString("None");        
         break;    
-<<<<<<< HEAD
+
     }    
     APlayerState* PlayerState = InPawn->GetPlayerState<APlayerState>();
     if(PlayerState)
@@ -41,25 +41,9 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
         FString RemoteRoleString = FString::Printf(TEXT("Remote Role: %s \n Name: %s"), *Role, *NameOfPlayer);
         SetDisplayText(RemoteRoleString);
     }
-=======
-    }
-    FString RemoteRoleString = FString::Printf(TEXT("Remote Role: %s"), *Role);
-    SetDisplayText(RemoteRoleString);
 
 }
 
-void UOverheadWidget::ShowPlayerName()
-{
-    APlayerController* PlayerController = GetOwningPlayer();
-    APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>();
-    if(PlayerState)
-    {
-        FString PlayerName = PlayerState->GetPlayerName();  
-        SetDisplayText(PlayerName);
-    }
-    
->>>>>>> e737ba831575f11e1e8f7b09bfb05a21db45032f
-}
 
 void UOverheadWidget::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
 {

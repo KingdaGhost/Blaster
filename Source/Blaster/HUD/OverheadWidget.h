@@ -23,6 +23,12 @@ public:
 	UFUNCTION(BlueprintCallable)	
 	void ShowPlayerNetRole(APawn* InPawn);
 
+<<<<<<< HEAD
+=======
+	UFUNCTION(BlueprintCallable)
+	void ShowPlayerName();
+
+>>>>>>> e737ba831575f11e1e8f7b09bfb05a21db45032f
 protected:
 	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
 };

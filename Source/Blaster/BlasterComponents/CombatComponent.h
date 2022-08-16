@@ -23,12 +23,18 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void SetIsAiming(bool bAiming); //Server and client side
+	UFUNCTION(Server, Reliable)
+	void ServerSetIsAiming(bool bAiming); //Server will replicate to all clients
+
 private:
 	class ABlasterCharacter* Character;
 	UPROPERTY(Replicated)
 	AWeapon* EquippedWeapon;
+	UPROPERTY(Replicated)
+	bool bIsAiming;
 public:	
-
+	
 
 		
 };

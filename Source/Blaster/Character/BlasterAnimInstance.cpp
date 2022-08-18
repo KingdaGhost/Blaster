@@ -50,4 +50,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
     const float Target = Delta.Yaw / DeltaTime; //This is so that it will be frame rate independent
     const float Interp = FMath::FInterpTo(Lean, Target, DeltaTime, 6.f); // to ease out the lean so that there will be no jerkiness
     Lean = FMath::Clamp(Interp, -90.f, 90.f);
+
+    AO_Yaw = BlasterCharacter->GetAO_Yaw();
+    AO_Pitch = BlasterCharacter->GetAO_Pitch();
 }

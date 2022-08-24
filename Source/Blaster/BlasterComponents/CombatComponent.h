@@ -32,11 +32,16 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	UFUNCTION(Server, Reliable)
+	void ServerFire(); //Server RPC
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire(); //Multicast RPC
+
 private:
 	class ABlasterCharacter* Character;
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated) //Replicated is used only when the value changes form one state to another state (true to false and vice versa) otherwise it is useless for continuous use incase of automatic weapon
 	bool bIsAiming;
 
 	UPROPERTY(EditAnywhere)

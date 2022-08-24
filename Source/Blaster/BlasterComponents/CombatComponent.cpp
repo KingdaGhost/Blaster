@@ -59,8 +59,23 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
+	if(bFireButtonPressed)
+	{
+		// THis server RPC is being called from the client and will be executed only on the server and no other clients will be able to see it
+		ServerFire(); 
+	}
+}
+
+void UCombatComponent::ServerFire_Implementation()
+{
+	//This multicast RPC is being called from the server and will invoke on all clients as well as the server
+	MulticastFire();
+}
+
+void UCombatComponent::MulticastFire_Implementation()
+{
 	if(EquippedWeapon == nullptr)  return;
-	if(Character && bFireButtonPressed)
+	if(Character)
 	{
 		Character->PlayFireMontage(bIsAiming);
 		EquippedWeapon->Fire();

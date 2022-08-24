@@ -20,6 +20,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void FireButtonPressed(bool bPressed);
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,6 +43,8 @@ private:
 	float BaseWalkSpeed;
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
+
+	bool bFireButtonPressed;
 public:	
 	
 

@@ -56,6 +56,15 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	Character->bUseControllerRotationYaw = true;
 }
 
+void UCombatComponent::FireButtonPressed(bool bPressed)
+{
+	bFireButtonPressed = bPressed;
+	if(Character && bFireButtonPressed)
+	{
+		Character->PlayFireMontage(bIsAiming);
+	}
+}
+
 void UCombatComponent::SetIsAiming(bool bAiming)
 {
 	bIsAiming = bAiming;

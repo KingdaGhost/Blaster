@@ -7,8 +7,6 @@
 #include "CombatComponent.generated.h"
 #define TRACE_LENGTH 80000.f
 
-#define Trace_Length 80000.f
-
 class AWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -55,7 +53,6 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
-
 	FVector HitTarget;
 public:	
 	

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
+#define TRACE_LENGTH 80000.f
 
 #define Trace_Length 80000.f
 

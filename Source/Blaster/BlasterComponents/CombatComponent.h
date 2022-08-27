@@ -21,8 +21,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void EquipWeapon(AWeapon* WeaponToEquip);
-	void FireButtonPressed(bool bPressed);
+	void EquipWeapon(AWeapon* WeaponToEquip);	
 protected:
 	virtual void BeginPlay() override;
 
@@ -34,10 +33,11 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
+	void FireButtonPressed(bool bPressed);
 	UFUNCTION(Server, Reliable)
-	void ServerFire(); //Server RPC
+	void ServerFire();
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire(); //Multicast RPC
+	void MulticastFire();
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
@@ -45,7 +45,7 @@ private:
 	class ABlasterCharacter* Character;
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
-	UPROPERTY(Replicated) //Replicated is used only when the value changes form one state to another state (true to false and vice versa) otherwise it is useless for continuous use incase of automatic weapon
+	UPROPERTY(Replicated)
 	bool bIsAiming;
 
 	UPROPERTY(EditAnywhere)

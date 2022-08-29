@@ -9,6 +9,9 @@
 void AProjectileWeapon::Fire(const FVector& HitTarget)
 {
 	Super::Fire(HitTarget);
+
+	if(!HasAuthority()) return;
+	
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner()); //The thing that is responsible for the projectile. This is to check who is doing the damage
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName(FName("MuzzleFlash"));
 

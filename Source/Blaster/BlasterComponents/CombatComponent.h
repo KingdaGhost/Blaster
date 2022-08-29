@@ -34,9 +34,9 @@ protected:
 
 	void FireButtonPressed(bool bPressed);
 	UFUNCTION(Server, Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& TraceHitTarget); //FVector_NetQuantize is to reduce bandwidth across the network and to replicate the projectile's direction on all clients
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire();
+	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
@@ -53,7 +53,6 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
-	FVector HitTarget;
 public:	
 	
 

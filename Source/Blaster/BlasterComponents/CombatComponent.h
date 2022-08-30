@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blaster/HUD/BlasterHUD.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
 #define TRACE_LENGTH 80000.f
@@ -67,6 +68,8 @@ private:
 
 	FVector HitTarget;
 
+	FHUDPackage HUDPackage;
+	
 	/**
 	 *	Aiming and FOV
 	 */

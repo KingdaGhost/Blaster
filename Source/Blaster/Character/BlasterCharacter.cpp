@@ -39,6 +39,7 @@ ABlasterCharacter::ABlasterCharacter()
 	GetMovementComponent()->NavAgentProps.bCanCrouch = true; //Setting the CanCrouch by default from here instead of the editor
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore); // Setting the collision of camera to  the character to ignore
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 850.f);
 
 

@@ -307,6 +307,12 @@ AWeapon* ABlasterCharacter::GetEquippedWeapon()
 	return Combat->EquippedWeapon;
 }
 
+FVector ABlasterCharacter::GetHitTarget() const
+{
+	if(Combat == nullptr) return  FVector();
+	return Combat->HitTarget;
+}
+
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
 	if(AO_Yaw > 90.f)

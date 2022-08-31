@@ -21,7 +21,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void EquipWeapon(AWeapon* WeaponToEquip);	
+	void EquipWeapon(AWeapon* WeaponToEquip);
+	void Fire();
 protected:
 	virtual void BeginPlay() override;
 
@@ -68,6 +69,7 @@ private:
 	float CrosshairInAirFactor;
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
+	float CrosshairPlayerAimFactor;
 
 	FVector HitTarget;
 
@@ -86,6 +88,16 @@ private:
 	float ZoomedInterpSpeed = 20.f;
 
 	void InterpFOV(float DeltaTime);
+
+	/**
+	 *	Automatic Fire
+	 */
+	FTimerHandle FireTimer;
+
+	bool bCanFire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
 public:	
 	
 

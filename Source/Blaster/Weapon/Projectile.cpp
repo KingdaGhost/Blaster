@@ -55,12 +55,12 @@ void AProjectile::BeginPlay()
 	}
 }
 
-void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) //This is only called on the server
 {
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if(BlasterCharacter)
 	{
-		BlasterCharacter->MulticastHitReact();
+		BlasterCharacter->MulticastHitReact(Hit.ImpactPoint);
 	}
 	Destroy(); //This will call the Destroyed function which is like an RPC that will propagate all data from server to clients
 }
@@ -74,14 +74,13 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::Destroyed()
 {
 	Super::Destroyed();
-	if(ImpactParticles)
+	if(MetalImpactParticles && BlasterCharacter == nullptr)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticles, GetActorTransform());
 	}
-	if(ImpactSound)
+	if(MetalImpactSound && BlasterCharacter == nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, MetalImpactSound, GetActorLocation());
 	}
-	
 }
 

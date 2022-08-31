@@ -13,6 +13,10 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "BlasterAnimInstance.h"
 #include "Blaster/Blaster.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -134,9 +138,10 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
-void ABlasterCharacter::MulticastHitReact_Implementation()
+void ABlasterCharacter::MulticastHitReact_Implementation(const FVector_NetQuantize& HitLocation)
 {
 	PlayHitReactMontage();
+	PlaySoundAndImpactEffect(HitLocation);
 }
 
 void ABlasterCharacter::PlayHitReactMontage()
@@ -149,6 +154,18 @@ void ABlasterCharacter::PlayHitReactMontage()
 		AnimInstance->Montage_Play(HitReactMontage);
 		FName SectionName("FromFront");
 		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
+void ABlasterCharacter::PlaySoundAndImpactEffect(const FVector_NetQuantize& HitLocation)
+{
+	if(CharacterImpactParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticles, HitLocation);
+	}
+	if(CharacterImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, CharacterImpactSound, HitLocation);
 	}
 }
 

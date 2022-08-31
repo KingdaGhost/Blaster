@@ -11,6 +11,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
 #include "Blaster/Blaster.h"
+#include "Net/UnrealNetwork.h"
 
 
 AProjectile::AProjectile()
@@ -31,7 +32,6 @@ AProjectile::AProjectile()
 	ProjectileMovementComponenet->bRotationFollowsVelocity = true; //rotation align with velocity when drop off will follow
 	
 }
-
 
 void AProjectile::BeginPlay()
 {
@@ -57,11 +57,14 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) //This is only called on the server
 {
-	BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	bIsCharacterHit = false;
 	if(BlasterCharacter)
 	{
+		bIsCharacterHit = true;
 		BlasterCharacter->MulticastHitReact(Hit.ImpactPoint); // The server will check and propagate to all clients
 	}
+	
 	Destroy(); //This will call the Destroyed function which is like an RPC that will propagate all data from server to clients
 }
 
@@ -74,14 +77,17 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::Destroyed()
 {
 	Super::Destroyed();
-	if(BlasterCharacter == nullptr) return; //This check is for the client because BlasterCharacter will always be null else the below code will run
-	if(MetalImpactParticles && BlasterCharacter == nullptr) //nullptr check for BlasterCharacter is for the Server. If this is not here then the below statements will run even if we hit the character
+	
+	if(bIsCharacterHit) return;
+	
+	if(MetalImpactParticles) //nullptr check for BlasterCharacter is for the Server. If this is not here then the below statements will run even if we hit the character
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticles, GetActorTransform());
 	}
-	if(MetalImpactSound && BlasterCharacter == nullptr)
+	if(MetalImpactSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, MetalImpactSound, GetActorLocation());
 	}
 }
+
 

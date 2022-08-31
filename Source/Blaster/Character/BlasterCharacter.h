@@ -22,6 +22,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHitReact();
+	virtual void OnRep_ReplicatedMovement() override;
 protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -32,7 +33,10 @@ protected:
 	void CrouchButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
+	void CalculateAO_Pitch();
+	float CalculateSpeed();
 	void AimOffset(float DeltaTime);
+	void SimProxiesTurn();
 	virtual void Jump() override;
 	void FireButtonPressed();
 	void FireButtonReleased();
@@ -74,6 +78,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
 
+	bool bRotateRootBone;
+	UPROPERTY(EditAnywhere, Category = Movement)
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;	
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
@@ -84,4 +96,5 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 };

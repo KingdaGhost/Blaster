@@ -21,8 +21,9 @@ public:
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHitReact();
+	void MulticastHitReact(const FVector_NetQuantize& HitLocation);
 	virtual void OnRep_ReplicatedMovement() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -41,6 +42,7 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void PlayHitReactMontage();
+	void PlaySoundAndImpactEffect(const FVector_NetQuantize& HitLocation);
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;
@@ -85,6 +87,11 @@ private:
 	FRotator ProxyRotation;	
 	float ProxyYaw;
 	float TimeSinceLastMovementReplication;
+	
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* CharacterImpactParticles;
+	UPROPERTY(EditAnywhere)
+	class USoundCue* CharacterImpactSound;
 
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);

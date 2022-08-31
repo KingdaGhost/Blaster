@@ -36,9 +36,12 @@ private:
 	class UParticleSystemComponent* TracerComponent;
 	
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* ImpactParticles;
+	UParticleSystem* MetalImpactParticles;
 	UPROPERTY(EditAnywhere)
-	class USoundCue* ImpactSound;
+	class USoundCue* MetalImpactSound;
+
+	UPROPERTY()
+	class ABlasterCharacter* BlasterCharacter;
 
 public:	
 

@@ -75,10 +75,11 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BlasterPlayerController = Cast<ABlasterPlayerController>(Controller);
-	if(BlasterPlayerController)
+	UpdateHUDHealth();
+
+	if(HasAuthority())
 	{
-		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
 	}
 }
 
@@ -144,12 +145,6 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
-void ABlasterCharacter::MulticastHitReact_Implementation(const FVector_NetQuantize& HitLocation)
-{
-	PlayHitReactMontage();
-	PlaySoundAndImpactEffect(HitLocation);
-}
-
 void ABlasterCharacter::PlayHitReactMontage()
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr) return; //because the animation is of the equipped type
@@ -163,16 +158,12 @@ void ABlasterCharacter::PlayHitReactMontage()
 	}
 }
 
-void ABlasterCharacter::PlaySoundAndImpactEffect(const FVector_NetQuantize& HitLocation)
+void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser) //This is called only on the server
 {
-	if(CharacterImpactParticles)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), CharacterImpactParticles, HitLocation);
-	}
-	if(CharacterImpactSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, CharacterImpactSound, HitLocation);
-	}
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
 
 void ABlasterCharacter::MoveForward(float Value) 
@@ -219,6 +210,7 @@ void ABlasterCharacter::EquipButtonPressed()
 		}
 	}
 }
+
 void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if(Combat)
@@ -390,9 +382,19 @@ void ABlasterCharacter::HideCameraIfCharacterClose()
 	}
 }
 
-void ABlasterCharacter::OnRep_Health()
+void ABlasterCharacter::OnRep_Health() //This will be called only on the clients
 {
-	
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+void ABlasterCharacter::UpdateHUDHealth()
+{
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+	if(BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)

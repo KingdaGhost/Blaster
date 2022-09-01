@@ -20,10 +20,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHitReact(const FVector_NetQuantize& HitLocation);
 	virtual void OnRep_ReplicatedMovement() override;
-	
+
 protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -42,7 +40,9 @@ protected:
 	void FireButtonPressed();
 	void FireButtonReleased();
 	void PlayHitReactMontage();
-	void PlaySoundAndImpactEffect(const FVector_NetQuantize& HitLocation);
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
+	void UpdateHUDHealth();
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;
@@ -88,11 +88,6 @@ private:
 	float ProxyYaw;
 	float TimeSinceLastMovementReplication;
 	
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* CharacterImpactParticles;
-	UPROPERTY(EditAnywhere)
-	class USoundCue* CharacterImpactSound;
-
 	/**
 	 * Player Health
 	 */

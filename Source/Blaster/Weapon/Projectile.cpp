@@ -56,15 +56,7 @@ void AProjectile::BeginPlay()
 }
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) //This is only called on the server
-{
-	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
-	bIsCharacterHit = false;
-	if(BlasterCharacter)
-	{
-		bIsCharacterHit = true;
-		BlasterCharacter->MulticastHitReact(Hit.ImpactPoint); // The server will check and propagate to all clients
-	}
-	
+{	
 	Destroy(); //This will call the Destroyed function which is like an RPC that will propagate all data from server to clients
 }
 
@@ -77,10 +69,8 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::Destroyed()
 {
 	Super::Destroyed();
-	
-	if(bIsCharacterHit) return;
-	
-	if(MetalImpactParticles) //nullptr check for BlasterCharacter is for the Server. If this is not here then the below statements will run even if we hit the character
+		
+	if(MetalImpactParticles) 
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MetalImpactParticles, GetActorTransform());
 	}

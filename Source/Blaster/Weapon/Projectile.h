@@ -39,8 +39,7 @@ private:
 	UParticleSystem* MetalImpactParticles;
 	UPROPERTY(EditAnywhere)
 	class USoundCue* MetalImpactSound;
-	
-
+	UPROPERTY()
 	bool bIsCharacterHit;
 
 public:	

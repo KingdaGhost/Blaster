@@ -20,8 +20,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	void PlayFireMontage(bool bAiming);
+	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
-	void Elim();
+	UFUNCTION(NetMulticast, Reliable)
+	void Elim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
 
 protected:
 	virtual void BeginPlay() override;
@@ -77,6 +79,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* HitReactMontage;
 
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* ElimMontage;
+	
 	void HideCameraIfCharacterClose();
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
@@ -103,6 +108,8 @@ private:
 
 	class ABlasterPlayerController* BlasterPlayerController;
 
+	bool bElimmed = false;
+
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
@@ -114,4 +121,5 @@ public:
 	FVector GetHitTarget() const;
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
+	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 };

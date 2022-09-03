@@ -159,6 +159,15 @@ void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon && Character) //This will check if weapon is equipped and check that character is not null on the clients
 	{
+		// These lines added needs to be done because SetWeaponState should be set first as it handles physics
+		// Having physics on weapons will not work when we attach actors.
+		// The reason is that there is no guarantee that SetWeaponState will be called first on the clients so we have to set it directly to clients and not wait for the server to relay the information
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		if(HandSocket)
+		{
+			HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
+		}		
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 	}

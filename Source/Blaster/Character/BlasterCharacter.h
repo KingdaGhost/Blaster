@@ -22,8 +22,9 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayElimMontage();
 	virtual void OnRep_ReplicatedMovement() override;
+	void Elim();
 	UFUNCTION(NetMulticast, Reliable)
-	void Elim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
+	void MulticastElim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
 
 protected:
 	virtual void BeginPlay() override;
@@ -109,6 +110,11 @@ private:
 	class ABlasterPlayerController* BlasterPlayerController;
 
 	bool bElimmed = false;
+
+	FTimerHandle ElimTimer;
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay = 3.0f;
+	void ElimTimerFinished();
 
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);

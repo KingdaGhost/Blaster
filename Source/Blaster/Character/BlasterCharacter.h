@@ -26,7 +26,8 @@ public:
 	void Elim();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
-
+	virtual void Destroyed() override;
+	
 protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float Value);
@@ -137,6 +138,18 @@ private:
 	//Material instance set on the Blueprint, used with the Dynamic Material Instance
 	UPROPERTY(EditAnywhere, Category = Elim)
 	UMaterialInstance* DissolveMaterialInstance;
+
+	/**
+	 *	Elim Bot
+	 */
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ElimBotEffect;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* ElimBotComponent;
+
+	UPROPERTY(EditAnywhere)
+	class USoundCue* ElimBotSound;
 
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);

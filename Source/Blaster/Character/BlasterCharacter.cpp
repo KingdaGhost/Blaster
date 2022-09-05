@@ -89,15 +89,14 @@ void ABlasterCharacter::Elim() //This is only on the server since it called from
 		&ABlasterCharacter::ElimTimerFinished,
 		ElimDelay
 		);
-	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
-	if(BlasterPlayerController)
-	{
-		BlasterPlayerController->ShowElimmedText();
-	}
 }
 
 void ABlasterCharacter::MulticastElim_Implementation()
 {
+	if(BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDWeaponAmmo(0);
+	}
 	bElimmed = true;
 	PlayElimMontage();
 

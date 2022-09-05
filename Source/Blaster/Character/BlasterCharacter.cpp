@@ -89,6 +89,11 @@ void ABlasterCharacter::Elim() //This is only on the server since it called from
 		&ABlasterCharacter::ElimTimerFinished,
 		ElimDelay
 		);
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+	if(BlasterPlayerController)
+	{
+		BlasterPlayerController->ShowElimmedText();
+	}
 }
 
 void ABlasterCharacter::MulticastElim_Implementation()
@@ -136,6 +141,13 @@ void ABlasterCharacter::MulticastElim_Implementation()
 			GetActorLocation()
 		);
 	}
+
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+	if(BlasterPlayerController)
+	{
+		BlasterPlayerController->ShowElimmedText();
+	}
+	
 }
 
 void ABlasterCharacter::ElimTimerFinished()
@@ -165,6 +177,10 @@ void ABlasterCharacter::BeginPlay()
 	if(HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
+	}
+	if(BlasterPlayerController)
+	{
+		BlasterPlayerController->HideElimmedText();
 	}
 }
 
@@ -511,6 +527,7 @@ void ABlasterCharacter::PollInit() // The PollInit will be valid until the Blast
 		if(BlasterPlayerState)
 		{
 			BlasterPlayerState->AddToScore(0.f);
+			BlasterPlayerState->AddToDefeats(0);
 		}
 	}
 }

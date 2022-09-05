@@ -145,6 +145,7 @@ void ABlasterCharacter::ElimTimerFinished()
 		BlasterGameMode->RequestRespawn(this, Controller);
 	}
 }
+
 void ABlasterCharacter::Destroyed()
 {
 	Super::Destroyed();

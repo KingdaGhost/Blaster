@@ -15,6 +15,7 @@
 #include "Blaster/Blaster.h"
 #include "Blaster/GameModes/BlasterGameMode.h"
 #include "Blaster/PlayerController/BlasterPlayerController.h"
+#include "Blaster/PlayerState/BlasterPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundCue.h"
@@ -185,6 +186,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 		CalculateAO_Pitch();
 	}	
 	HideCameraIfCharacterClose();
+	PollInit(); //Initialize the score to 0 since PlayerState is not valid in BeginPlay
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -498,6 +500,18 @@ void ABlasterCharacter::UpdateHUDHealth()
 	if(BlasterPlayerController)
 	{
 		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
+void ABlasterCharacter::PollInit() // The PollInit will be valid until the BlasterPlayerState has a valid value
+{
+	if(BlasterPlayerState == nullptr) 
+	{
+		BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
+		if(BlasterPlayerState)
+		{
+			BlasterPlayerState->AddToScore(0.f);
+		}
 	}
 }
 

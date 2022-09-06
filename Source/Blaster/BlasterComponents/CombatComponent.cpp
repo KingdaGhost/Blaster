@@ -88,6 +88,21 @@ void UCombatComponent::Fire()
 	}
 }
 
+void UCombatComponent::Reload()
+{
+	if(CarriedAmmo > 0) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
+	{
+		ServerReload();
+	}
+}
+
+void UCombatComponent::ServerReload_Implementation()
+{
+	if(Character == nullptr) return;
+
+	Character->PlayReloadMontage();
+}
+
 void UCombatComponent::StartFireTimer()
 {
 	if(EquippedWeapon == nullptr || Character == nullptr) return;

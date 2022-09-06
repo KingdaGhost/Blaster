@@ -25,6 +25,7 @@ public:
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void Fire();
+	void Reload();
 protected:
 	virtual void BeginPlay() override;
 
@@ -46,6 +47,9 @@ protected:
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 	void SetHUDCrosshairs(float DeltaTime);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
 private:
 	UPROPERTY()
 	class ABlasterCharacter* Character;

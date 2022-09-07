@@ -28,6 +28,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bIsAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly); //Only the client owning this class
+	DOREPLIFETIME(UCombatComponent, CombatState);
 }
 
 void UCombatComponent::BeginPlay()
@@ -90,7 +91,7 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
+	if(CarriedAmmo > 0 && CombatState != ECombatState::ECS_Reloading) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
 	{
 		ServerReload();
 	}
@@ -100,6 +101,31 @@ void UCombatComponent::ServerReload_Implementation()
 {
 	if(Character == nullptr) return;
 
+	CombatState = ECombatState::ECS_Reloading;
+	HandleReload();
+}
+
+void UCombatComponent::FinishReloading()
+{
+	if(Character == nullptr) return;
+	if(Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+}
+
+void UCombatComponent::OnRep_CombatState()
+{
+	switch (CombatState)
+	{
+	case ECombatState::ECS_Reloading:
+		HandleReload();
+		break;
+	}
+}
+
+void UCombatComponent::HandleReload()
+{
 	Character->PlayReloadMontage();
 }
 
@@ -367,3 +393,4 @@ void UCombatComponent::InitializeCarriedAmmo()
 {
 	CarriedAmmoMap.Emplace(EWeaponType::EWT_AssaultRifle, StartingARAmmo);
 }
+

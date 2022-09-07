@@ -88,5 +88,6 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
         // DrawDebugLine(GetWorld(), MuzzleTipTransform.GetLocation(), BlasterCharacter->GetHitTarget(), FColor::Orange);
     }
 
+    bUseFABRIK = BlasterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
     
 }

@@ -655,3 +655,11 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 		}
 	}
 }
+
+ECombatState ABlasterCharacter::GetCombatState() const
+{
+	if(Combat == nullptr) return ECombatState::ECS_MAX;
+
+	return Combat->CombatState;
+	
+}

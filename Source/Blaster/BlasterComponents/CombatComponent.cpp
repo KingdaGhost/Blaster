@@ -50,6 +50,11 @@ void UCombatComponent::BeginPlay()
 			InitializeCarriedAmmo();
 		}
 	}
+	Controller = Controller == nullptr ? Cast<ABlasterPlayerController>(Character->Controller) : Controller;
+	if(Controller)
+	{
+		Controller->SetHUDWeaponType(EWeaponType::EWT_NoWeapon);
+	}
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -266,6 +271,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) //Only on the  server
 	if(Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo); // We accessed it from here because the ammo is on the character
+		Controller->SetHUDWeaponType(EquippedWeapon->GetWeaponType());
 	}
 
 	if(EquippedWeapon->EquipSound)
@@ -300,6 +306,11 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		}		
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
+		Controller = Controller == nullptr ? Cast<ABlasterPlayerController>(Character->Controller) : Controller;
+		if(Controller)
+		{
+			Controller->SetHUDWeaponType(EquippedWeapon->GetWeaponType());
+		}
 		if(EquippedWeapon->EquipSound)
 		{
 			UGameplayStatics::PlaySoundAtLocation(

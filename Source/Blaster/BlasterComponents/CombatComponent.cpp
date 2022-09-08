@@ -105,12 +105,16 @@ void UCombatComponent::ServerReload_Implementation()
 	HandleReload();
 }
 
-void UCombatComponent::FinishReloading()
+void UCombatComponent::FinishReloading() //This function is being called from the Anim Event when a notify is being called 
 {
 	if(Character == nullptr) return;
 	if(Character->HasAuthority())
 	{
-		CombatState = ECombatState::ECS_Unoccupied;
+		CombatState = ECombatState::ECS_Unoccupied; // This is set so that we can reload again
+	}
+	if(bFireButtonPressed)
+	{
+		Fire();
 	}
 }
 
@@ -120,6 +124,12 @@ void UCombatComponent::OnRep_CombatState()
 	{
 	case ECombatState::ECS_Reloading:
 		HandleReload();
+		break;
+	case ECombatState::ECS_Unoccupied:
+		if(bFireButtonPressed)
+		{
+			Fire();
+		}
 		break;
 	}
 }
@@ -153,7 +163,7 @@ void UCombatComponent::FireTimerFinished()
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr) return false;
-	return  !EquippedWeapon->IsEmpty() && bCanFire; // if we use the OR(||) then we will be able to spam and overfire even when ammo is 0
+	return  !EquippedWeapon->IsEmpty() && bCanFire && CombatState == ECombatState::ECS_Unoccupied; // if we use the OR(||) then we will be able to spam and overfire even when ammo is 0
 }
 
 void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -164,7 +174,7 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if(EquippedWeapon == nullptr)  return;
-	if(Character)
+	if(Character && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		Character->PlayFireMontage(bIsAiming);
 		EquippedWeapon->Fire(TraceHitTarget);

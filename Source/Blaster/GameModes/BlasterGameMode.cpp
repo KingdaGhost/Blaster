@@ -9,6 +9,34 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
+ABlasterGameMode::ABlasterGameMode()
+{
+	bDelayedStart = true; // To make the MatchState in WaitingToStart state and characters will not be spawned yet
+}
+
+void ABlasterGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LevelStartingTime = GetWorld()->GetTimeSeconds(); // Time for this level
+}
+
+void ABlasterGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (MatchState == MatchState::WaitingToStart)
+	{
+		// GetWorld()->GetTimeSeconds() starts counting as soon as the game opens up
+		CountdownTime = WarmupTime - GetWorld()->GetTimeSeconds() + LevelStartingTime;
+		if(CountdownTime <= 0.f)
+		{
+			StartMatch();
+		}
+	}
+	
+}
+
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABlasterPlayerController* VictimController,
                                         ABlasterPlayerController* AttackerController)
 {

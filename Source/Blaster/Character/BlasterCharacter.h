@@ -29,9 +29,12 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastElim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
 	virtual void Destroyed() override;
-	
+
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
 protected:
 	virtual void BeginPlay() override;
+	void RotateInPlace(float DeltaTime);
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Turn(float Value);
@@ -181,4 +184,6 @@ public:
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	ECombatState GetCombatState() const;
+	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 };

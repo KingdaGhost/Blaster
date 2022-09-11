@@ -9,6 +9,11 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
+namespace MatchState
+{
+	const FName Cooldown = FName("Cooldown");
+}
+
 ABlasterGameMode::ABlasterGameMode()
 {
 	bDelayedStart = true; // To make the MatchState in WaitingToStart state and characters will not be spawned yet
@@ -24,7 +29,10 @@ void ABlasterGameMode::BeginPlay()
 void ABlasterGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	if (LevelStartingTime == 0.f)
+	{
+		LevelStartingTime = GetWorld()->GetTimeSeconds();		
+	}
 	if (MatchState == MatchState::WaitingToStart)
 	{
 		// GetWorld()->GetTimeSeconds() starts counting as soon as the game opens up
@@ -32,6 +40,14 @@ void ABlasterGameMode::Tick(float DeltaSeconds)
 		if(CountdownTime <= 0.f)
 		{
 			StartMatch();
+		}
+	}
+	else if (MatchState == MatchState::InProgress)
+	{
+		CountdownTime = WarmupTime + MatchTime - GetWorld()->GetTimeSeconds() + LevelStartingTime;
+		if(CountdownTime <= 0.f)
+		{
+			SetMatchState(MatchState::Cooldown);
 		}
 	}
 }

@@ -36,6 +36,7 @@ public:
 	void OnMatchStateSet(FName State);
 
 	void HandleMatchHasStarted();
+	void HandleCooldown();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -70,7 +71,7 @@ private:
 	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
 
-	float LevelStartingTime;
+	float LevelStartingTime = 0;;
 	float MatchTime = 0.f;
 	float WarmupTime = 0.f;
 	uint32 CountdownInt = 0;

@@ -94,5 +94,5 @@ void ABlasterHUD::AddAnouncement()
 	{
 		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
 		Announcement->AddToViewport();
-	}
+	}	
 }

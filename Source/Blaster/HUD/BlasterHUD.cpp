@@ -87,7 +87,7 @@ void ABlasterHUD::DrawCrosshair(UTexture2D* Texture, FVector2D ViewportCenter, F
 	);
 }
 
-void ABlasterHUD::AddAnouncement()
+void ABlasterHUD::AddAnnouncement()
 {
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if(PlayerController && AnnouncementClass)

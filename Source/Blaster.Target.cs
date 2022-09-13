@@ -8,6 +8,7 @@ public class BlasterTarget : TargetRules
 	public BlasterTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
+		// bUsesSteam = true;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.AddRange( new string[] { "Blaster" } );
 	}

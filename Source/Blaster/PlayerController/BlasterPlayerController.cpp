@@ -61,6 +61,14 @@ void ABlasterPlayerController::PollInit()
 
 void ABlasterPlayerController::SetHUDTime()
 {
+	if (HasAuthority())
+	{
+		BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
+		if (BlasterGameMode)
+		{
+			LevelStartingTime = BlasterGameMode->LevelStartingTime;
+		}
+	}
 	float TimeLeft = 0.f;
 	if (MatchState == MatchState::WaitingToStart)
 	{
@@ -381,7 +389,7 @@ void ABlasterPlayerController::HandleMatchHasStarted()
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 	if(BlasterHUD)
 	{
-		BlasterHUD->AddCharacterOverlay();
+		if(BlasterHUD->CharacterOverlay == nullptr)	BlasterHUD->AddCharacterOverlay(); // Add the character overlay only when it is null to avoid multiple addition of the HUD
 		if(BlasterHUD->Announcement)
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);

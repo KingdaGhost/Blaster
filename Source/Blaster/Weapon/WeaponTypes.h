@@ -4,7 +4,8 @@ UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
 	EWT_AssaultRifle UMETA(DisplayName = "Assault Rifle"),
-	EWT_NoWeapon UMETA(DisplayName = ""),
+	EWT_RocketLauncher UMETA(DisplayName = "Rocket Launcher"),
+	EWT_NoWeapon UMETA(DisplayName = "No Weapon"),
 
 	EWT_MAX UMETA(DisplayName = "DefaultMAX")
 };

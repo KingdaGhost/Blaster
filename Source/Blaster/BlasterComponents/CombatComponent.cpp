@@ -54,6 +54,7 @@ void UCombatComponent::BeginPlay()
 	if(Controller)
 	{
 		Controller->SetHUDWeaponType(EWeaponType::EWT_NoWeapon);
+		Controller->SetHUDCarriedAmmo(0);
 	}
 }
 

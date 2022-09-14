@@ -191,6 +191,7 @@ void ABlasterPlayerController::OnPossess(APawn* InPawn)
 	}
 	HideElimmedText();
 	SetHUDWeaponType(EWeaponType::EWT_NoWeapon);
+	SetHUDCarriedAmmo(0);
 }
 
 void ABlasterPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -286,11 +287,21 @@ void ABlasterPlayerController::SetHUDWeaponType(EWeaponType WeaponType)
 	if(bHudValid)
 	{
 		FText WeaponTypeText;
-		UEnum::GetDisplayValueAsText<EWeaponType>(WeaponType, WeaponTypeText);
-		if(WeaponType == EWeaponType::EWT_NoWeapon)
+		switch (WeaponType)
 		{
+		case EWeaponType::EWT_Pistol:
+			WeaponTypeText = FText::FromString("Pistol");
+			break;
+		case EWeaponType::EWT_AssaultRifle:
+			WeaponTypeText = FText::FromString("Assault Rifle");
+			break;
+		case EWeaponType::EWT_RocketLauncher:
+			WeaponTypeText = FText::FromString("Rocket Launcher");
+			break;
+		default:
 			WeaponTypeText = FText::FromString("");
-		}				
+			break;
+		}
 		BlasterHUD->CharacterOverlay->WeaponTypeText->SetText(WeaponTypeText);
 	}
 }

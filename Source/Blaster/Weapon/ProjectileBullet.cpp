@@ -4,8 +4,16 @@
 #include "ProjectileBullet.h"
 
 #include "GameFramework/Character.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
+AProjectileBullet::AProjectileBullet()
+{
+	ProjectileMovementComponenet = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponenet->bRotationFollowsVelocity = true; //rotation align with velocity when drop off will follow
+	ProjectileMovementComponenet->SetIsReplicated(true);
+}
 
 void AProjectileBullet::BeginPlay()
 {

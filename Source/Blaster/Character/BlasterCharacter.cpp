@@ -152,7 +152,17 @@ void ABlasterCharacter::MulticastElim_Implementation()
 	{
 		BlasterPlayerController->ShowElimmedText();
 	}
-	
+
+	bool bHideSniperScope = IsLocallyControlled() &&
+		Combat &&
+			Combat->bIsAiming &&
+				Combat->EquippedWeapon &&
+					Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle;
+
+	if(bHideSniperScope)
+	{
+		ShowSniperScopeWidget(false);
+	}
 }
 
 void ABlasterCharacter::ElimTimerFinished()

@@ -13,7 +13,6 @@
 #include "Blaster/PlayerController/BlasterPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Sound/SoundCue.h"
-#include "Blaster/Character/BlasterAnimInstance.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -83,14 +82,6 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 }
 
-void UCombatComponent::ShotgunShellReload()
-{
-	if (Character && Character->HasAuthority())
-	{
-		UpdateShotgunAmmoValues();
-	}
-}
-
 void UCombatComponent::Fire()
 {
 	if(CanFire())
@@ -151,37 +142,6 @@ void UCombatComponent::UpdateAmmoValues()
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
 	EquippedWeapon->AddAmmo(-ReloadAmount); // We pass in negative value because we subtract the AmmoToAdd from the Ammo already present in the gun
-}
-
-void UCombatComponent::UpdateShotgunAmmoValues()
-{
-	if(Character == nullptr || EquippedWeapon == nullptr) return;
-
-	if (CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
-	{
-		CarriedAmmoMap[EquippedWeapon->GetWeaponType()] -= 1;
-		CarriedAmmo = CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
-	}
-	Controller = Controller == nullptr ? Cast<ABlasterPlayerController>(Character->Controller) : Controller;
-	if(Controller)
-	{
-		Controller->SetHUDCarriedAmmo(CarriedAmmo);
-	}
-	EquippedWeapon->AddAmmo(-1);
-	if (EquippedWeapon->IsFull() || CarriedAmmo == 0)
-	{
-		JumpToShotgunEnd();
-	}
-}
-
-void UCombatComponent::JumpToShotgunEnd()
-{
-	// Jump to ShotgunEnd Section
-	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
-	if(AnimInstance && Character->GetReloadMontage())
-	{
-		AnimInstance->Montage_JumpToSection(FName("ShotgunEnd"));
-	}
 }
 
 void UCombatComponent::OnRep_CombatState()
@@ -247,7 +207,6 @@ void UCombatComponent::FireTimerFinished()
 bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon == nullptr) return false;
-	if (!EquippedWeapon->IsEmpty() && bCanFire && CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun) return true;
 	return  !EquippedWeapon->IsEmpty() && bCanFire && CombatState == ECombatState::ECS_Unoccupied; // if we use the OR(||) then we will be able to spam and overfire even when ammo is 0
 }
 
@@ -259,13 +218,6 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if(EquippedWeapon == nullptr)  return;
-	if(Character && CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)
-	{
-		Character->PlayFireMontage(bIsAiming);
-		EquippedWeapon->Fire(TraceHitTarget);
-		CombatState = ECombatState::ECS_Unoccupied;
-		return;
-	}
 	if(Character && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		Character->PlayFireMontage(bIsAiming);
@@ -522,15 +474,6 @@ void UCombatComponent::OnRep_CarriedAmmo()
 	if(Controller)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo); // We accessed it from here because the ammo is on the character
-	}
-	bool bJumpToShotgunEnd =
-		CombatState == ECombatState::ECS_Reloading &&
-			EquippedWeapon != nullptr &&
-				EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun &&
-					CarriedAmmo == 0;
-	if (bJumpToShotgunEnd)
-	{
-		JumpToShotgunEnd();
 	}
 }
 

@@ -107,7 +107,7 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState != ECombatState::ECS_Reloading) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
+	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
 	{
 		ServerReload();
 	}
@@ -184,6 +184,11 @@ void UCombatComponent::JumpToShotgunEnd()
 	}
 }
 
+void UCombatComponent::ThrowGrenadeFinished()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
+}
+
 void UCombatComponent::OnRep_CombatState()
 {
 	switch (CombatState)
@@ -195,6 +200,12 @@ void UCombatComponent::OnRep_CombatState()
 		if(bFireButtonPressed)
 		{
 			Fire();
+		}
+		break;
+	case ECombatState::ECS_ThrowingGrenade:
+		if (Character && !Character->IsLocallyControlled()) // This is to check to make sure that the Character is not locally controlled
+		{
+			Character->PlayThrowGrenadeMontage();
 		}
 		break;
 	}
@@ -217,6 +228,30 @@ int32 UCombatComponent::AmountToReload()
 		return FMath::Clamp(RoomInMag, 0, Least);
 	}
 	return 0;
+}
+
+void UCombatComponent::ThrowGrenade()
+{
+	if (CombatState != ECombatState::ECS_Unoccupied) return;
+
+	CombatState = ECombatState::ECS_ThrowingGrenade;
+	if (Character)
+	{
+		Character->PlayThrowGrenadeMontage();
+	}
+	if(Character && !Character->HasAuthority())
+	{
+		ServerThrowGrenade();		
+	}
+}
+
+void UCombatComponent::ServerThrowGrenade_Implementation()
+{
+	CombatState = ECombatState::ECS_ThrowingGrenade;
+	if (Character)
+	{
+		Character->PlayThrowGrenadeMontage();
+	}
 }
 
 void UCombatComponent::StartFireTimer()
@@ -301,7 +336,8 @@ void UCombatComponent::ServerSetIsAiming_Implementation(bool bAiming)
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) //Only on the  server
 {
 	if(Character == nullptr || WeaponToEquip == nullptr) return;
-
+	if (CombatState != ECombatState::ECS_Unoccupied) return; // we cannot equip weapon if we are reloading or throwing grenade
+		
 	if(EquippedWeapon)
 	{
 		EquippedWeapon->Dropped();	

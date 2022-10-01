@@ -107,7 +107,7 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::Reload()
 {
-	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
+	if(CarriedAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull()) // If there is no ammo to reload then it is a waste of bandwidth to send RPC to the server
 	{
 		ServerReload();
 	}

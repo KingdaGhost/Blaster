@@ -208,6 +208,10 @@ void ABlasterCharacter::BeginPlay()
 	{
 		BlasterPlayerController->HideElimmedText();
 	}
+	if (AttachedGrenade)
+	{
+		AttachedGrenade->SetVisibility(false);
+	}
 }
 
 

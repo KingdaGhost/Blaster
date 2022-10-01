@@ -23,7 +23,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void Fire();
 	void Reload();
@@ -71,6 +71,13 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerThrowGrenade();
+
+	void DropEquippedWeapon();
+	void AttachActorToRightHand(AActor* ActorToAttach);
+	void AttachActorToLeftHand(AActor* ActorToAttach);
+	void UpdateCarriedAmmo();
+	void PlayEquipWeaponSound();
+	void ReloadEmptyWeapon();
 private:
 	UPROPERTY()
 	class ABlasterCharacter* Character;

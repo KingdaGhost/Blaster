@@ -214,7 +214,6 @@ void ABlasterCharacter::BeginPlay()
 	}
 }
 
-
 void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -372,6 +371,8 @@ void ABlasterCharacter::GrenadeButtonPressed()
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                       AController* InstigatorController, AActor* DamageCauser) //This is called only on the server
 {
+	if (bElimmed) return;
+
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();

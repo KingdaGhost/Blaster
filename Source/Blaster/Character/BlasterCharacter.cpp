@@ -631,10 +631,13 @@ void ABlasterCharacter::HideCameraIfCharacterClose()
 	}
 }
 
-void ABlasterCharacter::OnRep_Health() //This will be called only on the clients
+void ABlasterCharacter::OnRep_Health(float LastHealth) //This will be called only on the clients
 {
 	UpdateHUDHealth();
-	PlayHitReactMontage();
+	if (Health < LastHealth)
+	{
+		PlayHitReactMontage();		
+	}
 }
 
 void ABlasterCharacter::UpdateHUDHealth()

@@ -51,10 +51,14 @@ void ABlasterPlayerController::PollInit()
 			CharacterOverlay = BlasterHUD->CharacterOverlay;
 			if(CharacterOverlay)
 			{
+				SetHUDWeaponType(EWeaponType::EWT_Pistol);
 				if(bInitializeHealth) SetHUDHealth(HUDHealth, HUDMaxHealth);
 				if(bInitializeShield) SetHUDShield(HUDShield, HUDMaxShield);
 				if(bInitializeScore) SetHUDScore(HUDScore);
-				if(bInitializeDefeats) SetHUDDefeats(HUDDefeats);				
+				if(bInitializeDefeats) SetHUDDefeats(HUDDefeats);
+				if(bInitializeCarriedAmmo) SetHUDCarriedAmmo(HUDCarriedAmmo);
+				if(bInitializeWeaponAmmo) SetHUDWeaponAmmo(HUDWeaponAmmo);
+				
 				ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
 				if (BlasterCharacter && BlasterCharacter->GetCombat())
 				{
@@ -196,10 +200,14 @@ void ABlasterPlayerController::OnPossess(APawn* InPawn)
 	{
 		SetHUDHealth(BlasterCharacter->GetHealth(), BlasterCharacter->GetMaxHealth());
 		SetHUDShield(BlasterCharacter->GetShield(), BlasterCharacter->GetMaxShield());
+		if (BlasterCharacter && BlasterCharacter->GetCombat())
+		{
+			SetHUDCarriedAmmo(BlasterCharacter->GetCombat()->GetCarriedAmmo());
+			SetHUDWeaponAmmo(BlasterCharacter->GetCombat()->GetWeaponAmmo());
+		}
 	}
 	HideElimmedText();
-	SetHUDWeaponType(EWeaponType::EWT_NoWeapon);
-	SetHUDCarriedAmmo(0);
+	SetHUDWeaponType(EWeaponType::EWT_Pistol);
 }
 
 void ABlasterPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -293,6 +301,11 @@ void ABlasterPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		BlasterHUD->CharacterOverlay->WeaponAmmoAmount->SetText(FText::FromString(AmmoText));
 	}
+	else
+	{
+		bInitializeWeaponAmmo = true;
+		HUDWeaponAmmo = Ammo;
+	}
 }
 
 void ABlasterPlayerController::SetHUDCarriedAmmo(int32 Ammo)
@@ -305,6 +318,11 @@ void ABlasterPlayerController::SetHUDCarriedAmmo(int32 Ammo)
 	{
 		FString AmmoText = FString::Printf(TEXT("%d"), Ammo);
 		BlasterHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(AmmoText));
+	}
+	else
+	{
+		bInitializeCarriedAmmo = true;
+		HUDCarriedAmmo = Ammo;
 	}
 }
 

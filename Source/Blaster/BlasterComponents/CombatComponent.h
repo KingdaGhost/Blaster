@@ -26,6 +26,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	void EquipWeapon(AWeapon* WeaponToEquip);
+	void SwapWeapons();
 	void Fire();
 	void Reload();
 	UFUNCTION(BlueprintCallable)
@@ -48,6 +49,7 @@ public:
 	void ServerLaunchGrenade(const FVector_NetQuantize& Target);
 
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -219,5 +221,6 @@ public:
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE int32 GetCarriedAmmo() const { return CarriedAmmo; }
 	FORCEINLINE int32 GetWeaponAmmo() const { if(EquippedWeapon) return EquippedWeapon->GetAmmo(); else return 0; }
+	bool ShouldSwapWeapons();
 };
 

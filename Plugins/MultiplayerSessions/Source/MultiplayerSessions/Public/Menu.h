@@ -22,7 +22,8 @@ public:
 
 protected:
 	virtual bool Initialize() override;
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override; 
+	// virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override; 
+	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld); 
 
 	// Callbacks for the custom delegate on the MultiplayerSessionsSubsystem
 	//	Without the UFUNCTION() it won't bound to the delegate because the delegate is declared as DYNAMIC

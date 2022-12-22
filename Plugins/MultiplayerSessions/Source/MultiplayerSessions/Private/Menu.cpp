@@ -70,7 +70,7 @@ bool UMenu::Initialize()
 
 void UMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
 {
-    Super::OnLevelRemovedFromWorld(InLevel, InWorld);
+    // Super::OnLevelRemovedFromWorld(InLevel, InWorld);
 	MenuTeardown();
 }
 

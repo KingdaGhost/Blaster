@@ -28,6 +28,7 @@ public:
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void SwapWeapons();
 	void Fire();
+	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
 	void Reload();
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();

@@ -98,7 +98,8 @@ void UCombatComponent::Fire()
 {
 	if(CanFire())
 	{
-		ServerFire(HitTarget); 
+		ServerFire(HitTarget);
+		LocalFire(HitTarget);
 		if(EquippedWeapon)
 		{
 			bCanFire = false; // This is so we cannot spam the fire button. Will wait until for Timer to finish
@@ -366,6 +367,12 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
+	if (Character && Character->IsLocallyControlled() && !Character->HasAuthority()) return;
+	LocalFire(TraceHitTarget);
+}
+
+void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
+{
 	if(EquippedWeapon == nullptr)  return;
 	if(Character && CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)
 	{
@@ -426,6 +433,7 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) //Only on the  server
 
 void UCombatComponent::SwapWeapons()
 {
+	if(CombatState != ECombatState::ECS_Unoccupied) return;
 	AWeapon* TempWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;
 	SecondaryWeapon =  TempWeapon;

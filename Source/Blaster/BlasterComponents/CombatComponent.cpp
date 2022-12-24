@@ -97,16 +97,49 @@ void UCombatComponent::ShotgunShellReload()
 void UCombatComponent::Fire()
 {
 	if(CanFire())
-	{
-		ServerFire(HitTarget);
-		LocalFire(HitTarget);
+	{		
 		if(EquippedWeapon)
 		{
 			bCanFire = false; // This is so we cannot spam the fire button. Will wait until for Timer to finish
 			CrosshairShootingFactor = 0.75;
+
+			switch (EquippedWeapon->FireType)
+			{
+			case EFireType::EFT_Projectile:
+				FireProjectileWeapon();
+				break;
+			case EFireType::EFT_HitScan:
+				FireHitScanWeapon();
+				break;
+			case EFireType::EFT_Shotgun:
+				FireShotgun();
+				break;
+			default:
+				break;
+			}
 		}
 		StartFireTimer();
 	}
+}
+
+void UCombatComponent::FireProjectileWeapon()
+{
+	LocalFire(HitTarget);
+	ServerFire(HitTarget);
+}
+
+void UCombatComponent::FireHitScanWeapon()
+{
+	if(EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget; // Calculate the scatter locally and sending it to the server so as to have consistency
+		LocalFire(HitTarget);
+		ServerFire(HitTarget);
+	}
+}
+
+void UCombatComponent::FireShotgun()
+{
 }
 
 void UCombatComponent::Reload()

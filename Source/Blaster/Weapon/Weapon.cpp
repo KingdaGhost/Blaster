@@ -74,7 +74,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWeapon, WeaponState);
-	DOREPLIFETIME(AWeapon, Ammo);
 }
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -219,10 +218,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 			}
 		}
 	}
-	if(HasAuthority())
-	{
-		SpendRound();
-	}	
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -250,14 +246,40 @@ void AWeapon::SetHUDAmmo()
 
 void AWeapon::SpendRound()
 {
-	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity); // by default on high ping there are lags to ammo values and HUD display
+	SetHUDAmmo(); // This is client side predicting where the clients first updates the Ammo and set the HUD and then later on processed by the server. The server will inevitably updates to the client's updated value and hence will function correctly
+	if (HasAuthority())
+	{
+		ClientUpdateAmmo(Ammo);
+	}
+	else //if it is the clients then we need to increase sequence since the ammo has not been updated by the server
+	{
+		++Sequence;
+	}
+}
+
+void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
+{
+	if (HasAuthority()) return;
+	Ammo = ServerAmmo;
+	--Sequence; // one of our unprocessed server request has been processed
+	Ammo -= Sequence;
 	SetHUDAmmo();
 }
 
-void AWeapon::OnRep_Ammo()
+void AWeapon::AddAmmo(int32 AmmoToAdd)
 {
-	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
-	if(BlasterOwnerCharacter && BlasterOwnerCharacter->GetCombat() && IsFull())
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	SetHUDAmmo();
+	ClientAddAmmo(AmmoToAdd);
+}
+
+void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
+{
+	if (HasAuthority()) return;
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	BlasterOwnerCharacter = BlasterOwnerCharacter ==  nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (BlasterOwnerCharacter && BlasterOwnerCharacter->GetCombat() && IsFull())
 	{
 		BlasterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
 	}
@@ -291,13 +313,6 @@ bool AWeapon::IsEmpty()
 bool AWeapon::IsFull()
 {
 	return Ammo == MagCapacity;
-}
-
-
-void AWeapon::AddAmmo(int32 AmmoToAdd)
-{
-	Ammo = FMath::Clamp(Ammo - AmmoToAdd, 0, MagCapacity);
-	SetHUDAmmo();
 }
 
 FVector AWeapon::TraceEndWithScatter(const FVector& HitTarget)

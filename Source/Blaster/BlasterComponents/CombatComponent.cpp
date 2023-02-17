@@ -200,7 +200,7 @@ void UCombatComponent::UpdateAmmoValues()
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
-	EquippedWeapon->AddAmmo(-ReloadAmount); // We pass in negative value because we subtract the AmmoToAdd from the Ammo already present in the gun
+	EquippedWeapon->AddAmmo(ReloadAmount); // We pass in negative value because we subtract the AmmoToAdd from the Ammo already present in the gun
 }
 
 void UCombatComponent::UpdateShotgunAmmoValues()
@@ -217,7 +217,7 @@ void UCombatComponent::UpdateShotgunAmmoValues()
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
-	EquippedWeapon->AddAmmo(-1);
+	EquippedWeapon->AddAmmo(1);
 	if (EquippedWeapon->IsFull() || CarriedAmmo == 0)
 	{
 		JumpToShotgunEnd();

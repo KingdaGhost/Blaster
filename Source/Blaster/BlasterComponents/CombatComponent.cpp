@@ -451,6 +451,14 @@ void UCombatComponent::ShotgunLocalFire(const TArray<FVector_NetQuantize>& Trace
 	}
 }
 
+void UCombatComponent::OnRep_Aiming()
+{
+	if (Character && Character->IsLocallyControlled())
+	{
+		bIsAiming = bAimButtonPressed;
+	}
+}
+
 void UCombatComponent::SetIsAiming(bool bAiming)
 {
 	if (Character == nullptr || EquippedWeapon == nullptr) return;
@@ -465,6 +473,7 @@ void UCombatComponent::SetIsAiming(bool bAiming)
 	{
 		Character->ShowSniperScopeWidget(bIsAiming);
 	}
+	if (Character->IsLocallyControlled()) bAimButtonPressed = bIsAiming;
 }
 
 void UCombatComponent::ServerSetIsAiming_Implementation(bool bAiming)

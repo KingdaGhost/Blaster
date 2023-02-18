@@ -130,6 +130,7 @@ void AWeapon::OnEquipped()
 		WeaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	}
 	EnableCustomDepth(false);
+	// UE_LOG(LogTemp, Warning, TEXT("Weapon Ammo: %d"), GetAmmo());
 }
 
 void AWeapon::OnDropped()

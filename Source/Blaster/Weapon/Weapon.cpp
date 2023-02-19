@@ -253,7 +253,7 @@ void AWeapon::SpendRound()
 	{
 		ClientUpdateAmmo(Ammo);
 	}
-	else //if it is the clients then we need to increase sequence since the ammo has not been updated by the server
+	else if(BlasterOwnerCharacter && BlasterOwnerCharacter->IsLocallyControlled())//if it is the clients then we need to increase sequence since the ammo has not been updated by the server. And also we need to check for locally controlled because other non-locally controlled clients will increase the sequence when they pick up the weapon and reload
 	{
 		++Sequence;
 	}
@@ -272,10 +272,10 @@ void AWeapon::AddAmmo(int32 AmmoToAdd)
 {
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
 	SetHUDAmmo();
-	ClientAddAmmo(AmmoToAdd);
+	MulticastAddAmmo(AmmoToAdd);
 }
 
-void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
+void AWeapon::MulticastAddAmmo_Implementation(int32 AmmoToAdd)
 {
 	if (HasAuthority()) return;
 	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);

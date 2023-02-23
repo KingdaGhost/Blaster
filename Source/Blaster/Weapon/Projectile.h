@@ -17,6 +17,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
 
+	/**
+	 *	Used with server-side rewind
+	 */
+	bool bUseServerSideRewind = false;
+	FVector_NetQuantize TraceStart;
+	FVector_NetQuantize100 InitialVelocity; // More accurate
+
+	UPROPERTY(EditAnywhere)
+	float InitialSpeed = 15000.f;
+
 protected:
 	virtual void BeginPlay() override;
 	void StartDestroyTimer();
@@ -52,6 +62,7 @@ protected:
 	float DamageInnerRadius = 200.f;
 	UPROPERTY(EditAnywhere)
 	float DamageOuterRadius = 500.f;
+
 	
 private:
 

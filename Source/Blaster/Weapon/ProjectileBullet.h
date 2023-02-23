@@ -19,6 +19,7 @@ protected:
 	// We dont need UFUNCTION macro because we override this function and will automatically include
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
+	
 public:
 
 };

@@ -358,6 +358,7 @@ FFramePackage ULagCompensationComponent::GetFrameToCheck(ABlasterCharacter* HitC
 		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
 	}
 
+	FrameToCheck.Character = HitCharacter; // This is assigned here because if we assigned it on top, it will be overridden when we perform the serverside algorithm
 	return FrameToCheck;
 }
 

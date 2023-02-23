@@ -12,7 +12,9 @@ class BLASTER_API AProjectileBullet : public AProjectile
 	GENERATED_BODY()
 public:
 	AProjectileBullet();
-
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
+#endif	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

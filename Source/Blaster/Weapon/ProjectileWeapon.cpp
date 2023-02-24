@@ -38,10 +38,10 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 					SpawnedProjectile->bUseServerSideRewind = false;
 					SpawnedProjectile->Damage = Damage;
 				}
-				else // on the server, not locally controlled - spawn non-replicated projectile, no ssr
+				else // on the server, not locally controlled - spawn non-replicated projectile, ssr
 				{
 					SpawnedProjectile = World->SpawnActor<AProjectile>(ServerSideRewindProjectileClass,	SocketTransform.GetLocation(), TargetRotation, SpawnParams);
-					SpawnedProjectile->bUseServerSideRewind = false;
+					SpawnedProjectile->bUseServerSideRewind = true; // Server side rewind bullets should not be doing damage on the server. If this is set to false then the clients will be doing double damage because the condition on projectile bullet will be true for all characters on the server
 				}
 			}
 			else // client, using ssr

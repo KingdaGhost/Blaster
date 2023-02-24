@@ -49,14 +49,20 @@ void ABlasterPlayerController::CheckPing(float DeltaSeconds)
 	HighPingRunningTime += DeltaSeconds;
 	if (HighPingRunningTime > CheckPingFrequency)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerState->GetCompressedPing() * 4: %d"), PlayerState->GetCompressedPing() * 4);
 		PlayerState = PlayerState == nullptr  ? GetPlayerState<APlayerState>() : PlayerState;
 		if (PlayerState)
 		{
 			if(PlayerState->GetCompressedPing() * 4 > HighPingThreshold) //ping is compressed; it's actually ping/4
-				{
+			{
 				HighPingWarning();
 				PingAnimationRunningTime = 0.f; //This is done once every 20 seconds
-				}
+				ServerReportPingStatus(true);
+			}
+			else
+			{
+				ServerReportPingStatus(false);
+			}
 		}
 		HighPingRunningTime = 0.f;
 	}
@@ -72,6 +78,12 @@ void ABlasterPlayerController::CheckPing(float DeltaSeconds)
 			StopHighPingWarning();
 		}
 	}
+}
+
+// Is the ping too high
+void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
+{
+	HighPingDelegate.Broadcast(bHighPing);
 }
 
 void ABlasterPlayerController::PollInit()

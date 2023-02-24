@@ -74,6 +74,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWeapon, WeaponState);
+	DOREPLIFETIME_CONDITION(AWeapon, bUseServerSideRewind, COND_OwnerOnly);
 }
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -131,6 +132,15 @@ void AWeapon::OnEquipped()
 	}
 	EnableCustomDepth(false);
 	// UE_LOG(LogTemp, Warning, TEXT("Weapon Ammo: %d"), GetAmmo());
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if(BlasterOwnerCharacter && bUseServerSideRewind) // if ssr is not set then we don't want to bind to the delegate
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+		if(BlasterOwnerController && HasAuthority() && !BlasterOwnerController->HighPingDelegate.IsBound()) // we need to check that no function is bound to the delegate before binding it to a function.
+		{
+			BlasterOwnerController->HighPingDelegate.AddDynamic(this, &AWeapon::OnPingTooHigh);
+		}
+	}
 }
 
 void AWeapon::OnDropped()
@@ -149,6 +159,16 @@ void AWeapon::OnDropped()
 	WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
 	WeaponMesh->MarkRenderStateDirty();
 	EnableCustomDepth(true);
+
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if(BlasterOwnerCharacter && bUseServerSideRewind) // if ssr is not set then we don't want to bind to the delegate
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+		if(BlasterOwnerController && HasAuthority() && BlasterOwnerController->HighPingDelegate.IsBound()) // we need to check that a function is bound to the delegate before unbinding it.
+		{
+			BlasterOwnerController->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
+		}
+	}
 }
 
 void AWeapon::OnEquippedSecondary()
@@ -168,6 +188,21 @@ void AWeapon::OnEquippedSecondary()
 	WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_TAN);
 	WeaponMesh->MarkRenderStateDirty();
 	EnableCustomDepth(true);
+	
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if(BlasterOwnerCharacter && bUseServerSideRewind) // if ssr is not set then we don't want to bind to the delegate
+	{
+		BlasterOwnerController = BlasterOwnerController == nullptr ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->Controller) : BlasterOwnerController;
+		if(BlasterOwnerController && HasAuthority() && BlasterOwnerController->HighPingDelegate.IsBound()) // we need to check that a function is bound to the delegate before unbinding it.
+		{
+			BlasterOwnerController->HighPingDelegate.RemoveDynamic(this, &AWeapon::OnPingTooHigh);
+		}
+	}
+}
+
+void AWeapon::OnPingTooHigh(bool bPingTooHigh)
+{
+	bUseServerSideRewind = !bPingTooHigh; // if ping is too high then set ssr to false and vice versa
 }
 
 void AWeapon::OnRep_WeaponState()

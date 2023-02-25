@@ -50,7 +50,7 @@ void ABlasterPlayerController::CheckPing(float DeltaSeconds)
 	HighPingRunningTime += DeltaSeconds;
 	if (HighPingRunningTime > CheckPingFrequency)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerState->GetCompressedPing() * 4: %d"), PlayerState->GetCompressedPing() * 4);
+		// UE_LOG(LogTemp, Warning, TEXT("PlayerState->GetCompressedPing() * 4: %d"), PlayerState->GetCompressedPing() * 4);
 		PlayerState = PlayerState == nullptr  ? GetPlayerState<APlayerState>() : PlayerState;
 		if (PlayerState)
 		{
@@ -106,7 +106,7 @@ void ABlasterPlayerController::ShowReturnToMainMenu()
 // Is the ping too high
 void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
 {
-	UE_LOG(LogTemp, Warning, TEXT("bHighPing: %d"), bHighPing);
+	// UE_LOG(LogTemp, Warning, TEXT("bHighPing: %d"), bHighPing);
 	HighPingDelegate.Broadcast(bHighPing);
 }
 

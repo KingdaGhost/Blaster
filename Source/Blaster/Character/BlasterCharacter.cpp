@@ -484,6 +484,15 @@ void ABlasterCharacter::PlayThrowGrenadeMontage()
 	}
 }
 
+void ABlasterCharacter::PlaySwapMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance && SwapMontage)
+	{
+		AnimInstance->Montage_Play(SwapMontage);
+	}
+}
+
 void ABlasterCharacter::PlayHitReactMontage()
 {
 	if(Combat == nullptr || Combat->EquippedWeapon == nullptr) return; //because the animation is of the equipped type
@@ -579,7 +588,17 @@ void ABlasterCharacter::EquipButtonPressed()
 	if(bDisableGameplay) return;
 	if(Combat)
 	{
-		ServerEquipButtonPressed();
+		if(Combat->CombatState == ECombatState::ECS_Unoccupied) ServerEquipButtonPressed();
+		bool bSwap = Combat->ShouldSwapWeapons() &&
+			!HasAuthority() &&
+				Combat->CombatState == ECombatState::ECS_Unoccupied &&
+					OverlappingWeapon == nullptr; // We need to check with the overlappingWeapon beacuse we will be stuck in the SwappingWeapon State when we equipped the overlapping weapon
+		if (bSwap) // The swap montage is played on the server from the SwapWeapon() so we need to play the montage only on the locally controlled client.
+		{ // We need to check for unoccupied so that we won't be able to spam swapping
+			PlaySwapMontage();
+			Combat->CombatState = ECombatState::ECS_SwappingWeapons;
+			bFinishedSwapping = false;
+		}
 	}
 }
 

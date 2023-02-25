@@ -83,6 +83,7 @@ void ABlasterPlayerController::CheckPing(float DeltaSeconds)
 // Is the ping too high
 void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
 {
+	UE_LOG(LogTemp, Warning, TEXT("bHighPing: %d"), bHighPing);
 	HighPingDelegate.Broadcast(bHighPing);
 }
 

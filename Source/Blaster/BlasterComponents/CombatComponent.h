@@ -37,6 +37,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
 	
+	UFUNCTION(BlueprintCallable)
+	void FinishSwap();
+	
+	UFUNCTION(BlueprintCallable)
+	void FinishSwapAttachWeapons();
+	
 	void FireButtonPressed(bool bPressed);
 
 	UFUNCTION(BlueprintCallable)

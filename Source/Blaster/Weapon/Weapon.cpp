@@ -187,7 +187,6 @@ void AWeapon::OnEquippedSecondary()
 	
 	WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_TAN);
 	WeaponMesh->MarkRenderStateDirty();
-	EnableCustomDepth(true);
 	
 	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
 	if(BlasterOwnerCharacter && bUseServerSideRewind) // if ssr is not set then we don't want to bind to the delegate

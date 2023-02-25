@@ -11,6 +11,8 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -32,9 +34,9 @@ public:
 	void PlaySwapMontage();
 	
 	virtual void OnRep_ReplicatedMovement() override;
-	void Elim();
+	void Elim(bool bPlayerLeftGame);
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim(); //This needs to be an RPC multicast since it has to play the montage on all clients as well
+	void MulticastElim(bool bPlayerLeftGame); //This needs to be an RPC multicast since it has to play the montage on all clients as well
 	virtual void Destroyed() override;
 
 	UPROPERTY(Replicated)
@@ -52,6 +54,11 @@ public:
 	TMap<FName, class UBoxComponent*> HitCollisionBoxes;
 
 	bool bFinishedSwapping = false;
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
+
+	FOnLeftGame OnLeftGame;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -242,6 +249,8 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float ElimDelay = 3.0f;
 	void ElimTimerFinished();
+
+	bool bLeftGame = false;
 
 	/*
 	 * Dissolve Effect

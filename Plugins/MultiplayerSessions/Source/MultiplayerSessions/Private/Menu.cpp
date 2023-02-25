@@ -68,10 +68,10 @@ bool UMenu::Initialize()
     return true;
 }
 
-void UMenu::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+void UMenu::NativeDestruct()
 {
-    // Super::OnLevelRemovedFromWorld(InLevel, InWorld);
-	MenuTeardown();
+    MenuTeardown();
+    Super::NativeDestruct();
 }
 
 void UMenu::OnCreateSession(bool bWasSuccessful)

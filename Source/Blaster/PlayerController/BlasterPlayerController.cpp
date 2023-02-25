@@ -10,6 +10,7 @@
 #include "Blaster/HUD/Announcement.h"
 #include "Blaster/HUD/BlasterHUD.h"
 #include "Blaster/HUD/CharacterOverlay.h"
+#include "Blaster/HUD/ReturnToMainMenu.h"
 #include "Blaster/PlayerState/BlasterPlayerState.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
@@ -80,6 +81,28 @@ void ABlasterPlayerController::CheckPing(float DeltaSeconds)
 	}
 }
 
+void ABlasterPlayerController::ShowReturnToMainMenu()
+{
+	if (ReturnToMainMenuWidget == nullptr) return;;
+	if (ReturnToMainMenu == nullptr)
+	{
+		ReturnToMainMenu = CreateWidget<UReturnToMainMenu>(this, ReturnToMainMenuWidget);
+	}
+	if (ReturnToMainMenu)
+	{
+		bReturnToMainMenuOpen = !bReturnToMainMenuOpen; // This is set to the opposite to itself because
+		if (bReturnToMainMenuOpen)
+		{
+			ReturnToMainMenu->MenuSetup();
+		}
+		else
+		{
+			ReturnToMainMenu->MenuTeardown();
+		}
+	}
+	
+}
+
 // Is the ping too high
 void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
 {
@@ -113,6 +136,14 @@ void ABlasterPlayerController::PollInit()
 			}
 		}
 	}
+}
+
+void ABlasterPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	if (InputComponent == nullptr) return;
+
+	InputComponent->BindAction("Quit", IE_Pressed, this, &ABlasterPlayerController::ShowReturnToMainMenu);
 }
 
 void ABlasterPlayerController::SetHUDTime()

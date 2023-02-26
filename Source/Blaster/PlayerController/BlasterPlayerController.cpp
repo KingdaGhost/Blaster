@@ -20,6 +20,44 @@
 #include "Net/UnrealNetwork.h"
 
 
+void ABlasterPlayerController::BroadcastElim(APlayerState* Attacker, APlayerState* Victim)
+{
+	ClientElimAnnouncement(Attacker, Victim); // This is so that all the clients will display the ElimAnnouncement locally on to their own screen
+}
+
+void ABlasterPlayerController::ClientElimAnnouncement_Implementation(APlayerState* Attacker, APlayerState* Victim)
+{
+	APlayerState* Self = GetPlayerState<APlayerState>();
+	if (Attacker && Victim && Self)
+	{
+		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if (BlasterHUD)
+		{
+			if (Attacker == Self && Victim != Self) // we killed other player
+			{
+				BlasterHUD->AddElimAnnouncement("You", Victim->GetPlayerName());
+				return;
+			}
+			if (Victim == Self && Attacker != Self) // someone killed us
+			{
+				BlasterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), "You");
+				return;
+			}
+			if (Attacker == Victim && Attacker == Self) // we killed ourselves
+			{
+				BlasterHUD->AddElimAnnouncement("You", "Yourself");
+				return;
+			}
+			if (Attacker == Victim && Attacker != Self) // someone else killed themselves
+			{
+				BlasterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), "Themselves");
+				return;
+			}
+			BlasterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), Victim->GetPlayerName());
+		}
+	}
+}
+
 void ABlasterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

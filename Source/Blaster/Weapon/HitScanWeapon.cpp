@@ -34,9 +34,11 @@ void AHitScanWeapon::Fire(const FVector& HitTarget)
 			bool bCauseAuthDamage = !bUseServerSideRewind || OwnerPawn->IsLocallyControlled(); // if ssr is turned off then this will be true and the server will apply damage accordingly and replicate but if we are the locally controlled server then only the server will deal damage
 			if (HasAuthority() && bCauseAuthDamage)
 			{
+				const float DamageToCause = FireHit.BoneName.ToString() == FString("head") ? HeadShotDamage : Damage; // The hit bone is determined by the physics asset of the character
+				
 				UGameplayStatics::ApplyDamage(
 				BlasterCharacter,
-					Damage,
+					DamageToCause,
 					InstigatorController,
 					this,
 					UDamageType::StaticClass()
@@ -110,6 +112,10 @@ void AHitScanWeapon::WeaponTraceHit(const FVector& TraceStart, const FVector& Hi
 		if (OutHit.bBlockingHit)
 		{
 			BeamEnd = OutHit.ImpactPoint;
+		}
+		else
+		{
+			OutHit.ImpactPoint = End;
 		}
 		// DrawDebugSphere(GetWorld(), BeamEnd, 16.f, 12, FColor::Orange, true);
 		if (BeamParticles)

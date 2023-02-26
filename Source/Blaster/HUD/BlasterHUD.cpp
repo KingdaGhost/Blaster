@@ -6,8 +6,10 @@
 #include "Announcement.h"
 #include "ElimAnnouncement.h"
 #include "CharacterOverlay.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/UserWidget.h"
-
+#include "Components/CanvasPanelSlot.h"
+#include "Components/HorizontalBox.h"
 
 
 void ABlasterHUD::BeginPlay()
@@ -108,6 +110,40 @@ void ABlasterHUD::AddElimAnnouncement(FString Attacker, FString Victim)
 		{
 			ElimAnnouncementWidget->SetElimAnnouncementText(Attacker, Victim);
 			ElimAnnouncementWidget->AddToViewport();
+
+			for (UElimAnnouncement* Msg : ElimMessages) // Move all the old messages up before adding new one
+			{
+				if (Msg && Msg->AnnouncementBox)
+				{
+					UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Msg->AnnouncementBox);
+					if (CanvasSlot)
+					{
+						FVector2D Position = CanvasSlot->GetPosition();
+						FVector2D NewPosition(Position.X, Position.Y - CanvasSlot->GetSize().Y); // we subtract because we want to go up as in the widgetBP, up means negative
+						CanvasSlot->SetPosition(NewPosition);
+					}
+				}
+			}
+			
+			ElimMessages.Add(ElimAnnouncementWidget);
+			// if (ElimMessages[0]) UE_LOG(LogTemp, Warning, TEXT("ELimMsg Size: %i"), ElimMessages.Num());
+			FTimerHandle ElimMsgTimer;
+			FTimerDelegate ElimMsgDelegate;
+			ElimMsgDelegate.BindUFunction(this, FName("ElimAnnouncementTimerFinished"), ElimAnnouncementWidget); // this line is for binding the callback ElimAnnouncementTimerFinished function and passing in the ElimAnnouncementWidget to the ElimMsgDelegate
+			GetWorldTimerManager().SetTimer(
+				ElimMsgTimer,
+				ElimMsgDelegate,
+				ElimAnnouncementTime,
+				false
+			); // After the ElimAnnouncementTime has run out then the function below will be called to remove the msg
 		}
+	}
+}
+
+void ABlasterHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
+{
+	if (MsgToRemove)
+	{
+		MsgToRemove->RemoveFromParent();
 	}
 }

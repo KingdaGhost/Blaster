@@ -182,3 +182,8 @@ void ABlasterGameMode::SendChat(const FString& Text, const FString& PlayerName)
 		}
 	}
 }
+
+float ABlasterGameMode::CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage)
+{
+	return BaseDamage;
+}

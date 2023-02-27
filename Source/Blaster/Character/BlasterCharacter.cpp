@@ -274,7 +274,7 @@ void ABlasterCharacter::MulticastElim_Implementation(bool bPlayerLeftGame)
 
 void ABlasterCharacter::ElimTimerFinished()
 {
-	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	BlasterGameMode = BlasterGameMode == nullptr  ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	if(BlasterGameMode && !bLeftGame)
 	{
 		BlasterGameMode->RequestRespawn(this, Controller);
@@ -287,7 +287,7 @@ void ABlasterCharacter::ElimTimerFinished()
 
 void ABlasterCharacter::ServerLeaveGame_Implementation()
 {
-	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	BlasterGameMode = BlasterGameMode == nullptr  ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	BlasterPlayerState = BlasterPlayerState == nullptr ? GetPlayerState<ABlasterPlayerState>() : BlasterPlayerState;
 	if(BlasterGameMode && BlasterPlayerState)
 	{
@@ -331,7 +331,7 @@ void ABlasterCharacter::Destroyed()
 		ElimBotComponent->DestroyComponent();
 	}
 
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+	BlasterGameMode = BlasterGameMode == nullptr  ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	bool bMatchNotInProgress = BlasterGameMode && BlasterGameMode->GetMatchState() != MatchState::InProgress;
 	if(Combat && Combat->EquippedWeapon && bMatchNotInProgress)
 	{
@@ -592,8 +592,13 @@ void ABlasterCharacter::GrenadeButtonPressed()
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                       AController* InstigatorController, AActor* DamageCauser) //This is called only on the server
 {
-	if (bElimmed) return;
-
+	BlasterGameMode = BlasterGameMode == nullptr  ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
+	
+	if (bElimmed || BlasterGameMode == nullptr) return;
+	// Even though we call the BlasterGameMode->CalculateDamage, it instead calls the TeamsGameMode->CalculateDamage because of Polymorphism since we use the virtual keyword and thus we dont need to cast to the TeamsGameMode.
+	// This is because our current GameMode is the TeamsGameMode
+	Damage = BlasterGameMode->CalculateDamage(InstigatorController, Controller, Damage);
+	
 	float DamageToHealth = Damage;
 
 	if (Shield > 0.f)
@@ -612,11 +617,13 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	Health = FMath::Clamp(Health - DamageToHealth, 0.f, MaxHealth);
 	UpdateHUDHealth();
 	UpdateHUDShield();
-	PlayHitReactMontage();
+	if (Damage != 0.f) // if there is no damage then no hit reaction. THis is solely on the server
+	{
+		PlayHitReactMontage(); // This is for the server, the rep notify is for the Clients
+	}
 
 	if(Health == 0.f)
 	{
-		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
 		if(BlasterGameMode)
 		{
 			BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
@@ -926,7 +933,7 @@ void ABlasterCharacter::UpdateHUDAmmo()
 
 void ABlasterCharacter::SpawnDefaultWeapon()
 {
-	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+	BlasterGameMode = BlasterGameMode == nullptr  ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	UWorld* World = GetWorld();
 	if (BlasterGameMode && World && !bElimmed && DefaultWeaponClass)
 	{

@@ -162,21 +162,21 @@ void ABlasterPlayerController::ToggleInputChatBox()
 {
 	if (ChatSystemWidget && ChatSystemWidget->InputTextBox)
 	{
-		if (ChatSystemWidget->InputTextBox->GetVisibility() == ESlateVisibility::Collapsed)
-		{
-			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Visible);
-			FInputModeGameAndUI InputMode;
-			InputMode.SetWidgetToFocus(ChatSystemWidget->InputTextBox->TakeWidget());
-			SetInputMode(InputMode);
-			SetShowMouseCursor(true);
-		}
-		else
-		{
-			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Collapsed);
-			FInputModeGameOnly InputMode;
-			SetInputMode(InputMode);
-			SetShowMouseCursor(false);
-		}
+ 		if (ChatSystemWidget->InputTextBox->GetVisibility() == ESlateVisibility::Collapsed)
+ 		{
+ 			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Visible);
+ 			FInputModeGameAndUI InputMode;
+ 			InputMode.SetWidgetToFocus(ChatSystemWidget->InputTextBox->TakeWidget());
+ 			SetInputMode(InputMode);
+ 			SetShowMouseCursor(true);
+ 		}
+ 		else
+ 		{
+ 			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Collapsed);
+ 			FInputModeGameOnly InputMode;
+ 			SetInputMode(InputMode);
+ 			SetShowMouseCursor(false);
+ 		}
 	}
 }
 

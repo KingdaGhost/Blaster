@@ -34,11 +34,14 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_Defeats)
 	int32 Defeats; // OnRep_Defeats will be called to clients whenever Defeats changes
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	ETeam Team = ETeam::ET_NoTeam;
 
+	UFUNCTION()
+	void OnRep_Team();
+
 public:
+	void SetTeam(ETeam TeamToSet);
 	FORCEINLINE ETeam GetTeam() const { return Team; }
-	FORCEINLINE void SetTeam(ETeam TeamToSet) { Team = TeamToSet ; }
 	
 };

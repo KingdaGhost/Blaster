@@ -60,6 +60,26 @@ void ABlasterPlayerState::AddToDefeats(int32 DefeatsAmount)
 	}
 }
 
+void ABlasterPlayerState::OnRep_Team()
+{
+	ABlasterCharacter* BCharacter = Cast<ABlasterCharacter>(GetPawn());
+	if (BCharacter)
+	{
+		BCharacter->SetTeamColor(Team);
+	}
+}
+
+void ABlasterPlayerState::SetTeam(ETeam TeamToSet) // This is called from the TeamsGameMode as soon as the match starts or join mid game
+{
+	 Team = TeamToSet ;
+
+	ABlasterCharacter* BCharacter = Cast<ABlasterCharacter>(GetPawn());
+	 if (BCharacter)
+	 {
+		 BCharacter->SetTeamColor(Team);
+	 }
+}
+
 void ABlasterPlayerState::OnRep_Defeats()
 {
 	Character = Character == nullptr ? Cast<ABlasterCharacter>(GetPawn()) : Character;
@@ -72,4 +92,5 @@ void ABlasterPlayerState::OnRep_Defeats()
 		}
 	}
 }
+
 

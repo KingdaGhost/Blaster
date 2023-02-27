@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blaster/BlasterComponents/CombatComponent.h"
 #include "Blaster/BlasterTypes/CombatState.h"
+#include "Blaster/BlasterTypes/Team.h"
 #include "GameFramework/Character.h"
 #include "Blaster/BlasterTypes/TurningInPlace.h"
 #include "Blaster/Interfaces/InteractWithCrosshairsInterface.h"
@@ -64,6 +65,8 @@ public:
 	void MulticastGainedTheLead();
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLostTheLead();
+
+	void SetTeamColor(ETeam Team);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -275,9 +278,27 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Elim)
 	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
 	//Material instance set on the Blueprint, used with the Dynamic Material Instance
-	UPROPERTY(EditAnywhere, Category = Elim)
+	UPROPERTY(VisibleAnywhere, Category = Elim)
 	UMaterialInstance* DissolveMaterialInstance;
 
+	/**
+	 * Team Colors
+	 */
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedDissolveMatInst;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueDissolveMatInst;
+	
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* OriginalMaterial;
+	
 	/**
 	 *	Elim effects
 	 */

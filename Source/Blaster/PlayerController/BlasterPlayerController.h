@@ -47,6 +47,9 @@ public:
 	FHighPingDelegate HighPingDelegate;
 
 	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+
+	UFUNCTION(Client, Reliable)
+	void ClientSetText(const FString& Text, const FString& PlayerName);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -87,6 +90,16 @@ protected:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+
+	void AddChatBox();
+	UFUNCTION()
+	void ToggleInputChatBox();
+	UFUNCTION()
+	void OnTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetText(const FString& Text, const FString& PlayerName);
+	
 private:
 	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
@@ -100,6 +113,14 @@ private:
 	UPROPERTY()
 	class UReturnToMainMenu* ReturnToMainMenu;
 	bool bReturnToMainMenuOpen = false;
+
+	/**
+	 *	Chat System
+	 */
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<class UChatSystemOverlay> ChatSystemOverlayClass;
+	UPROPERTY()
+	UChatSystemOverlay*  ChatSystemWidget;
 	
 	UPROPERTY()
 	class ABlasterGameMode* BlasterGameMode;

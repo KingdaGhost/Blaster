@@ -6,6 +6,7 @@
 #include "Announcement.h"
 #include "ElimAnnouncement.h"
 #include "CharacterOverlay.h"
+#include "ChatSystemOverlay.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CanvasPanelSlot.h"
@@ -147,3 +148,4 @@ void ABlasterHUD::ElimAnnouncementTimerFinished(UElimAnnouncement* MsgToRemove)
 		MsgToRemove->RemoveFromParent();
 	}
 }
+

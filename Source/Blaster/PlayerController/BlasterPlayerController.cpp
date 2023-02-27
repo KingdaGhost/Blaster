@@ -10,8 +10,10 @@
 #include "Blaster/HUD/Announcement.h"
 #include "Blaster/HUD/BlasterHUD.h"
 #include "Blaster/HUD/CharacterOverlay.h"
+#include "Blaster/HUD/ChatSystemOverlay.h"
 #include "Blaster/HUD/ReturnToMainMenu.h"
 #include "Blaster/PlayerState/BlasterPlayerState.h"
+#include "Components/EditableText.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -65,6 +67,7 @@ void ABlasterPlayerController::BeginPlay()
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
 
 	ServerCheckMatchState();
+	AddChatBox();
 }
 
 void ABlasterPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -137,9 +140,96 @@ void ABlasterPlayerController::ShowReturnToMainMenu()
 		{
 			ReturnToMainMenu->MenuTeardown();
 		}
-	}
-	
+	}	
 }
+
+void ABlasterPlayerController::AddChatBox()
+{
+	if (!IsLocalPlayerController()) return;
+	if (ChatSystemOverlayClass)
+	{
+		ChatSystemWidget = ChatSystemWidget == nullptr ? CreateWidget<UChatSystemOverlay>(this, ChatSystemOverlayClass) : ChatSystemWidget;
+		if (ChatSystemWidget)
+		{
+			ChatSystemWidget->AddToViewport();
+			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Collapsed);
+			ChatSystemWidget->InputTextBox->OnTextCommitted.AddDynamic(this, &ABlasterPlayerController::OnTextCommitted);
+		}
+	}
+}
+
+void ABlasterPlayerController::ToggleInputChatBox()
+{
+	if (ChatSystemWidget && ChatSystemWidget->InputTextBox)
+	{
+		if (ChatSystemWidget->InputTextBox->GetVisibility() == ESlateVisibility::Collapsed)
+		{
+			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Visible);
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(ChatSystemWidget->InputTextBox->TakeWidget());
+			SetInputMode(InputMode);
+			SetShowMouseCursor(true);
+		}
+		else
+		{
+			ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Collapsed);
+			FInputModeGameOnly InputMode;
+			SetInputMode(InputMode);
+			SetShowMouseCursor(false);
+		}
+	}
+}
+
+void ABlasterPlayerController::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	if (CommitMethod != ETextCommit::OnEnter) return;
+	
+	PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+	FString PlayerName("");
+	if (PlayerState)
+	{
+		PlayerName = PlayerState->GetPlayerName();
+	}
+	if(ChatSystemWidget)
+	{
+		// UE_LOG(LogTemp, Warning, TEXT("Here"));
+		if (!Text.IsEmpty())
+		{
+			ServerSetText(Text.ToString(), PlayerName);
+		}
+		ChatSystemWidget->InputTextBox->SetText(FText());
+		ChatSystemWidget->InputTextBox->SetVisibility(ESlateVisibility::Collapsed);
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(false);
+	}
+}
+
+void ABlasterPlayerController::ServerSetText_Implementation(const FString& Text, const FString& PlayerName)
+{
+	BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
+	if (BlasterGameMode)
+	{
+		BlasterGameMode->SendChat(Text, PlayerName);
+	}
+}
+
+void ABlasterPlayerController::ClientSetText_Implementation(const FString& Text, const FString& PlayerName)
+{
+	PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+	if (ChatSystemWidget && PlayerState)
+	{
+		if (PlayerName == PlayerState->GetPlayerName())
+		{
+			ChatSystemWidget->SetChatText(Text, "You");
+		}
+		else
+		{
+			ChatSystemWidget->SetChatText(Text, PlayerName);
+		}
+	}
+}
+
 
 // Is the ping too high
 void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
@@ -169,8 +259,7 @@ void ABlasterPlayerController::PollInit()
 				if (BlasterCharacter && BlasterCharacter->GetCombat())
 				{
 					if(bInitializeGrenades) SetHUDGrenades(BlasterCharacter->GetCombat()->GetGrenades());
-				}
-				
+				}				
 			}
 		}
 	}
@@ -182,6 +271,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	if (InputComponent == nullptr) return;
 
 	InputComponent->BindAction("Quit", IE_Pressed, this, &ABlasterPlayerController::ShowReturnToMainMenu);
+	InputComponent->BindAction("Chat", IE_Pressed, this, &ABlasterPlayerController::ToggleInputChatBox);
 }
 
 void ABlasterPlayerController::SetHUDTime()

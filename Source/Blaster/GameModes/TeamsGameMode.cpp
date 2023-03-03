@@ -8,6 +8,11 @@
 #include "Kismet/GameplayStatics.h"
 
 
+ATeamsGameMode::ATeamsGameMode()
+{
+	bTeamsMatch = true;
+}
+
 void ATeamsGameMode::PostLogin(APlayerController* NewPlayer) // This is for the players joining mid game
 {
 	Super::PostLogin(NewPlayer);

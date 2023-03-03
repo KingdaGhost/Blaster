@@ -30,16 +30,19 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	void HideTeamScores();
+	void InitTeamScores();
+	void SetHUDRedTeamScore(int32 RedScore);
+	void SetHUDBlueTeamScore(int32 BlueScore);
 	virtual float GetServerTime(); // Synced with server world clock
 	virtual void ReceivedPlayer() override; // Sync with server clock as soon as possible
 	
 	void ShowElimmedText();
 	void HideElimmedText();
 
-	void OnMatchStateSet(FName State);
+	void OnMatchStateSet(FName State, bool bTeamsMatch = false);
 
-	void HandleMatchHasStarted();
+	void HandleMatchHasStarted(bool bTeamsMatch = false);
 	void HandleCooldown();
 
 	float SingleTripTime = 0;
@@ -99,7 +102,12 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetText(const FString& Text, const FString& PlayerName);
-	
+
+	UPROPERTY(ReplicatedUsing = OnRep_ShowTeamScores)
+	bool bShowTeamScores = false;
+
+	UFUNCTION()
+	void OnRep_ShowTeamScores();
 private:
 	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;

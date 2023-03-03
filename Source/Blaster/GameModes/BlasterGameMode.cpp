@@ -76,7 +76,7 @@ void ABlasterGameMode::OnMatchStateSet()
 		ABlasterPlayerController* BlasterPlayer = Cast<ABlasterPlayerController>(*It); //We need to pass in the dereference the Iterator to the casting 
 		if(BlasterPlayer)
 		{
-			BlasterPlayer->OnMatchStateSet(MatchState);
+			BlasterPlayer->OnMatchStateSet(MatchState, bTeamsMatch);
 		}
 	}
 }

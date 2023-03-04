@@ -56,13 +56,13 @@ void ABlasterGameMode::Tick(float DeltaSeconds)
 		CountdownTime = CooldownTime + WarmupTime + MatchTime - GetWorld()->GetTimeSeconds() + LevelStartingTime;
 		if(CountdownTime <= 0.f)
 		{
-			RestartGame();
-			// UWorld* World = GetWorld();
-			// if (World)
-			// {
-			// 	bUseSeamlessTravel = true;
-			// 	World->ServerTravel(FString("/Game/Assets/Maps/BlasterArena?listen"));
-			// }
+			// RestartGame();
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				bUseSeamlessTravel = true;
+				World->ServerTravel(FString("/Game/Assets/Maps/BlasterArena?listen"));
+			}
 		}
 	}
 }

@@ -240,6 +240,8 @@ private:
 	int32 MaxGrenades = 4;
 
 	void UpdateHUDGrenades();
+
+	bool bIsHoldingTheFlag = false;
 public:
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE int32 GetCarriedAmmo() const { return CarriedAmmo; }

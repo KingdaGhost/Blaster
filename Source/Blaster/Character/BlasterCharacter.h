@@ -360,6 +360,7 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	FORCEINLINE int32 GetCarriedAmmo() const { return Combat->CarriedAmmo; }
-	bool IsLocallyReloading();
+	bool IsLocallyReloading() const;
 	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
+	bool IsHoldingTheFlag() const;
 };

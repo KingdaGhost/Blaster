@@ -563,9 +563,10 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip) //Only on the  server
 	{
 		Character->Crouch();
 		bIsHoldingTheFlag = true;
+		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped); // Make sure attachment happens before it is attached to the left hand
 		AttachFlagToLeftHand(WeaponToEquip);
-		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
 		WeaponToEquip->SetOwner(Character);
+		TheFlag = WeaponToEquip;
 	}
 	else
 	{

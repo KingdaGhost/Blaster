@@ -423,6 +423,13 @@ void ABlasterCharacter::Tick(float DeltaTime)
 
 void ABlasterCharacter::RotateInPlace(float DeltaTime)
 {
+	if (Combat && Combat->bIsHoldingTheFlag)
+	{
+		bUseControllerRotationYaw = false; // only move the camera not the character
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
 	if(bDisableGameplay)
 	{
 		bUseControllerRotationYaw = false; // only move the camera not the character

@@ -82,6 +82,8 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if(BlasterCharacter)
 	{
+		if (WeaponType == EWeaponType::EWT_Flag && BlasterCharacter->GetTeam() != Team) return; // if it is not on the same team then dont enable pickup 
+		if (BlasterCharacter->IsHoldingTheFlag()) return; // if holding the flag then dont show the pickup widget
 		BlasterCharacter->SetOverlappingWeapon(this);
 	}
 }
@@ -91,6 +93,8 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if(BlasterCharacter)
 	{
+		if (WeaponType == EWeaponType::EWT_Flag && BlasterCharacter->GetTeam() != Team) return;
+		if (BlasterCharacter->IsHoldingTheFlag()) return;
 		BlasterCharacter->SetOverlappingWeapon(nullptr);
 	}
 }

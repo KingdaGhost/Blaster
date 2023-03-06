@@ -20,6 +20,7 @@
 #include "Blaster/GameModes/BlasterGameMode.h"
 #include "Blaster/GameState/BlasterGameState.h"
 #include "Blaster/PlayerController/BlasterPlayerController.h"
+#include "Blaster/PlayerStart/TeamPlayerStart.h"
 #include "Blaster/PlayerState/BlasterPlayerState.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -310,6 +311,43 @@ void ABlasterCharacter::DropOrDestroyWeapons()
 		if (Combat->TheFlag)
 		{
 			Combat->TheFlag->Dropped();
+		}
+	}
+}
+
+void ABlasterCharacter::OnPlayerStateInitialized()
+{
+	BlasterPlayerState->AddToScore(0.f);
+	BlasterPlayerState->AddToDefeats(0);
+	SetTeamColor(BlasterPlayerState->GetTeam());
+	SetSpawnPoint();
+}
+
+void ABlasterCharacter::SetSpawnPoint()
+{
+	if (HasAuthority() && BlasterPlayerState->GetTeam() != ETeam::ET_NoTeam)
+	{
+		TArray<AActor*> PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(this, ATeamPlayerStart::StaticClass(), PlayerStarts);
+		TArray<ATeamPlayerStart*> TeamPlayerStarts;
+		for (auto Start : PlayerStarts)
+		{
+			ATeamPlayerStart* TeamStart = Cast<ATeamPlayerStart>(Start);
+			// Every character in the server will check their own team from BlasterPlayerState with the TeamStart team and will create
+			// each instance of TeamPlayerStarts and add the teamstart found in the map equal to its own team in the teamplayerstarts array
+			if (TeamStart && TeamStart->Team == BlasterPlayerState->GetTeam()) 
+			{
+				TeamPlayerStarts.Add(TeamStart);
+			}
+		}
+		// UE_LOG(LogTemp, Warning, TEXT("TeamPlayerStarts: %d"), TeamPlayerStarts.Num());
+		if (TeamPlayerStarts.Num() > 0) // This means that the character will spawn in their own teamplayerstart
+		{
+			ATeamPlayerStart* ChosenPlayerStart = TeamPlayerStarts[FMath::RandRange(0, TeamPlayerStarts.Num() - 1)];
+			SetActorLocationAndRotation(
+				ChosenPlayerStart->GetActorLocation(),
+				ChosenPlayerStart->GetActorRotation()
+			);
 		}
 	}
 }
@@ -973,9 +1011,7 @@ void ABlasterCharacter::PollInit() // The PollInit will be valid until the Blast
 		BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
 		if(BlasterPlayerState)
 		{
-			BlasterPlayerState->AddToScore(0.f);
-			BlasterPlayerState->AddToDefeats(0);
-			SetTeamColor(BlasterPlayerState->GetTeam());
+			OnPlayerStateInitialized();
 			ABlasterGameState*  BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 			if (BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(BlasterPlayerState))
 			{
